@@ -2,21 +2,18 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-export interface Message {
-  from: string;
-  to: string;
-  content: string;
-}
+import {Message} from '../../core/model/MessageModel';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
   private stompClient: any;
-  private messageSubject = new Subject<Message>();
+  private readonly messageSubject = new Subject<Message>();
   private username: string = '';
 
   constructor() {
+    this.username = localStorage.getItem('username') ?? '';
     this.connect();
   }
 
@@ -24,7 +21,9 @@ export class WebsocketService {
     const socket = new SockJS('http://localhost:8080/ws');
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({}, (frame: any) => {
-      console.log('Connected: ' + frame);
+      if (this.username && this.username.trim() !== ''){
+        this.setUsername(this.username);
+      }
     });
   }
 
@@ -37,8 +36,8 @@ export class WebsocketService {
 
   sendMessage(to: string, content: string) {
     const message: Message = {
-      from: this.username,
-      to: to,
+      sender: this.username,
+      recipient: to,
       content: content
     };
     this.stompClient.send('/app/send', {}, JSON.stringify(message));

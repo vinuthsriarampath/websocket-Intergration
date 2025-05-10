@@ -1,0 +1,11 @@
+<div class="w-screen h-screen bg-blue-200 flex justify-center items-center">
+  <div class="w-md h-48 bg-gray-200 p-4 rounded-lg flex flex-col gap-2">
+    <h1 class="font-black">Join the chat!!</h1>
+    <form class="flex flex-col justify-center gap-2" (ngSubmit)="onSubmit()">
+      <input type="text" [(ngModel)]="username" id="username" name="username" placeholder="Username" class="w-full py-2 px-1 border-1 border-blue-300" required />
+      <input type="submit" value="Join" class="text-center bg-blue-500 text-white font-semibold py-2">
+    </form>
+    <a [routerLink]="['register']"> New User ?</a>
+  </div>
+</div>
+

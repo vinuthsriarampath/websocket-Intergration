@@ -1,0 +1,34 @@
+<div class="w-screen h-screen flex bg-blue-200">
+  <div class="w-1/5 flex flex-col gap-2 border-r-4 border-black overflow-y-auto">
+    <div class="px-4 py-2 h-12 bg-blue-400/20 flex items-center">
+      <h3 class="text-lg font-semibold">Chats</h3>
+    </div>
+    <div *ngFor="let user of otherUsers" class="flex gap-2 py-2 px-3 bg-amber-50 mx-2 rounded-lg cursor-pointer" (click)="selectUser(user.username)">
+      <div class="flex flex-col">
+        <p>{{ user.username }}</p>
+        <p>{{ user.email }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-4/5 flex flex-col">
+    <div class="px-4 py-2 h-12 bg-blue-400/20 flex items-center">
+      <h3 class="text-lg font-semibold">{{ recipient || 'Select a chat' }}</h3>
+    </div>
+    <div class="flex-1 overflow-y-auto px-2">
+      <ul>
+        <li *ngFor="let msg of messages" [ngClass]="{'ml-auto bg-blue-100': msg.sender === username,'mr-auto bg-white': msg.sender !== username}" class="max-w-md rounded-lg my-3 p-2">
+          <p class="font-semibold">{{ msg.sender }}</p>
+          <p>{{ msg.content }}</p>
+          <p class="text-xs text-gray-500">{{ msg.timestamp | date:'short' }}</p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="px-4 py-2 bg-blue-400/20 flex gap-2">
+      <input [(ngModel)]="message" class="w-full p-2 outline-none" placeholder="Type a message" (keydown.enter)="sendMessage()" [disabled]="!recipient"/>
+      <button (click)="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded" [disabled]="!recipient">Send
+      </button>
+    </div>
+  </div>
+</div>
