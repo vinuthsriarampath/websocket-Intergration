@@ -23,5 +23,5 @@ public class MessageEntity {
     @Column(name = "content")
     private String content;
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private LocalDateTime timestamp = LocalDateTime.now();
 }
