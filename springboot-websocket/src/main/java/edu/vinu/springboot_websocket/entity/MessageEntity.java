@@ -1,5 +1,6 @@
 package edu.vinu.springboot_websocket.entity;
 
+import edu.vinu.springboot_websocket.util.MessageStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,4 +25,6 @@ public class MessageEntity {
     private String content;
     @Column(name = "timestamp")
     private LocalDateTime timestamp = LocalDateTime.now();
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status = MessageStatus.SENT;
 }

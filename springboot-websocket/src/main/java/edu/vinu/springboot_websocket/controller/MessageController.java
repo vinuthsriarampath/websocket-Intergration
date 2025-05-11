@@ -1,8 +1,10 @@
 package edu.vinu.springboot_websocket.controller;
 
 import edu.vinu.springboot_websocket.model.Message;
+import edu.vinu.springboot_websocket.requestDto.MessageStatusUpdate;
 import edu.vinu.springboot_websocket.response.ApiResponse;
 import edu.vinu.springboot_websocket.service.MessageService;
+import edu.vinu.springboot_websocket.util.MessageStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -21,6 +23,20 @@ public class MessageController {
     @MessageMapping("/send")
     public void sendMessage(@RequestBody Message message) {
         messageService.saveAndSendMessage(message);
+    }
+
+    // Handle delivery acknowledgment
+    @MessageMapping("/delivered")
+    public void handleDelivered(@RequestBody MessageStatusUpdate statusUpdate) {
+        messageService.updateMessageStatus(statusUpdate.getMessageId(), MessageStatus.DELIVERED);
+        messageService.broadcastStatusUpdate(statusUpdate);
+    }
+
+    // Handle read acknowledgment
+    @MessageMapping("/read")
+    public void handleRead(@RequestBody MessageStatusUpdate statusUpdate) {
+        messageService.updateMessageStatus(statusUpdate.getMessageId(), MessageStatus.READ);
+        messageService.broadcastStatusUpdate(statusUpdate);
     }
 
     @GetMapping("/history/{user1}/{user2}")
