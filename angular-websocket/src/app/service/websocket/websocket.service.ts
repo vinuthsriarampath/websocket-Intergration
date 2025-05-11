@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 import {Message} from '../../core/model/MessageModel';
+import { MessageStatusUpdate } from '../../core/model/MessageStatusUpdate';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import {Message} from '../../core/model/MessageModel';
 export class WebsocketService {
   private stompClient: any;
   private readonly messageSubject = new Subject<Message>();
+  private readonly statusSubject = new Subject<MessageStatusUpdate>();
   private username: string = '';
 
   constructor() {
@@ -20,7 +22,7 @@ export class WebsocketService {
   private connect() {
     const socket = new SockJS('http://localhost:8080/ws');
     this.stompClient = Stomp.over(socket);
-    this.stompClient.connect({}, (frame: any) => {
+    this.stompClient.connect({}, () => {
       if (this.username && this.username.trim() !== ''){
         this.setUsername(this.username);
       }
@@ -30,20 +32,34 @@ export class WebsocketService {
   setUsername(username: string) {
     this.username = username;
     this.stompClient.subscribe('/queue/messages-' + username, (message: any) => {
-      this.messageSubject.next(JSON.parse(message.body));
+      const msg: Message = JSON.parse(message.body);
+      this.messageSubject.next(msg);
+      // Send DELIVERED acknowledgment
+      if (msg.id) {
+        this.sendStatusUpdate(msg.id, 'DELIVERED');
+      }
+    });
+    // Subscribe to status updates
+    this.stompClient.subscribe('/queue/status-' + username, (status: any) => {
+      this.statusSubject.next(JSON.parse(status.body));
     });
   }
 
-  sendMessage(to: string, content: string) {
-    const message: Message = {
-      sender: this.username,
-      recipient: to,
-      content: content
-    };
+  sendMessage(message:Message ) {
     this.stompClient.send('/app/send', {}, JSON.stringify(message));
+  }
+
+  // Send status update (DELIVERED or READ)
+  sendStatusUpdate(messageId: number, status: string) {
+    const statusUpdate: MessageStatusUpdate = { messageId, status };
+    this.stompClient.send(`/app/${status.toLowerCase()}`, {}, JSON.stringify(statusUpdate));
   }
 
   getMessages() {
     return this.messageSubject.asObservable();
+  }
+
+  getStatusUpdates() {
+    return this.statusSubject.asObservable();
   }
 }

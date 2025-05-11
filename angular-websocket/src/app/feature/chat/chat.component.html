@@ -3,7 +3,11 @@
     <div class="px-4 py-2 h-12 bg-blue-400/20 flex items-center">
       <h3 class="text-lg font-semibold">Chats</h3>
     </div>
-    <div *ngFor="let user of otherUsers" class="flex gap-2 py-2 px-3 bg-amber-50 mx-2 rounded-lg cursor-pointer" (click)="selectUser(user.username)">
+    <div
+      *ngFor="let user of otherUsers"
+      class="flex gap-2 py-2 px-3 bg-amber-50 mx-2 rounded-lg cursor-pointer"
+      (click)="selectUser(user.username)"
+    >
       <div class="flex flex-col">
         <p>{{ user.username }}</p>
         <p>{{ user.email }}</p>
@@ -17,17 +21,49 @@
     </div>
     <div class="flex-1 overflow-y-auto px-2">
       <ul>
-        <li *ngFor="let msg of messages" [ngClass]="{'ml-auto bg-blue-100': msg.sender === username,'mr-auto bg-white': msg.sender !== username}" class="max-w-md rounded-lg my-3 p-2">
+        <li
+          *ngFor="let msg of messages"
+          [ngClass]="{
+            'ml-auto bg-blue-100': msg.sender === username,
+            'mr-auto bg-white': msg.sender !== username
+          }"
+          class="max-w-md rounded-lg my-3 p-2 relative"
+        >
           <p class="font-semibold">{{ msg.sender }}</p>
           <p>{{ msg.content }}</p>
           <p class="text-xs text-gray-500">{{ msg.timestamp | date:'short' }}</p>
+          <!-- Status indicators (ticks) for sender's messages -->
+          <span *ngIf="msg.sender === username" class="absolute bottom-2 right-2 flex items-center">
+            <svg *ngIf="msg.status === 'SENT'" class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            <svg *ngIf="msg.status === 'DELIVERED'" class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            <svg *ngIf="msg.status === 'READ'" class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8 8.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </span>
         </li>
       </ul>
     </div>
 
     <div class="px-4 py-2 bg-blue-400/20 flex gap-2">
-      <input [(ngModel)]="message" class="w-full p-2 outline-none" placeholder="Type a message" (keydown.enter)="sendMessage()" [disabled]="!recipient"/>
-      <button (click)="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded" [disabled]="!recipient">Send
+      <input
+        [(ngModel)]="message"
+        class="w-full p-2 outline-none"
+        placeholder="Type a message"
+        (keydown.enter)="sendMessage()"
+        [disabled]="!recipient"
+      />
+      <button
+        (click)="sendMessage()"
+        class="bg-blue-500 text-white px-4 py-2 rounded"
+        [disabled]="!recipient"
+      >
+        Send
       </button>
     </div>
   </div>
